@@ -23,7 +23,7 @@ export const esquemaEntradaCalculo = z.object({
     .min(0, { message: "La ocupación debe ser al menos 0% (0.0)." })
     .max(1, { message: "La ocupación no puede superar el 100% (1.0)." }),
 
-  moneda: z.enum(["USD", "EUR", "COP", "MXN"] as const).optional().default("USD"),
+  moneda: z.enum(["USD", "EUR", "DOP"] as const).optional().default("USD"),
 
   // --- Ajustes Avanzados Opcionales ---
   costosCierrePorcentaje: z.number().min(0).max(1).optional(),

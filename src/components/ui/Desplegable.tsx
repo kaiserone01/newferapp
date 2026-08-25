@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import gsap from "gsap";
 
 export interface DesplegableProps {
   titulo: string;
@@ -18,9 +19,77 @@ export const Desplegable: React.FC<DesplegableProps> = ({
   className = "",
 }) => {
   const [abierto, setAbierto] = useState(abiertoInicial);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    const ctx = gsap.context(() => {
+      const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (isFirstRender.current) {
+        isFirstRender.current = false;
+        if (abierto) {
+          gsap.set(el, { height: "auto", opacity: 1, visibility: "visible" });
+        } else {
+          gsap.set(el, { height: 0, opacity: 0, visibility: "hidden" });
+        }
+        return;
+      }
+
+      if (isReduced) {
+        if (abierto) {
+          gsap.set(el, { height: "auto", opacity: 1, visibility: "visible" });
+        } else {
+          gsap.set(el, { height: 0, opacity: 0, visibility: "hidden" });
+        }
+      } else {
+        if (abierto) {
+          gsap.killTweensOf(el);
+          gsap.fromTo(
+            el,
+            { height: 0, opacity: 0, visibility: "visible" },
+            {
+              height: el.scrollHeight,
+              opacity: 1,
+              duration: 0.3,
+              ease: "power2.out",
+              onComplete: () => {
+                gsap.set(el, { height: "auto" });
+              },
+            }
+          );
+        } else {
+          gsap.killTweensOf(el);
+          const currentHeight = el.offsetHeight;
+          gsap.fromTo(
+            el,
+            { height: currentHeight, opacity: 1 },
+            {
+              height: 0,
+              opacity: 0,
+              duration: 0.3,
+              ease: "power2.out",
+              onComplete: () => {
+                gsap.set(el, { visibility: "hidden" });
+              },
+            }
+          );
+        }
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, [abierto]);
 
   return (
-    <div className={`w-full rounded-[10px] border border-[var(--line)] bg-[var(--ink-800)] overflow-hidden ${className}`}>
+    <div
+      ref={containerRef}
+      className={`w-full rounded-[10px] border border-[var(--line)] bg-[var(--ink-800)] overflow-hidden ${className}`}
+    >
       <button
         type="button"
         onClick={() => setAbierto(!abierto)}
@@ -45,7 +114,16 @@ export const Desplegable: React.FC<DesplegableProps> = ({
           </svg>
         </div>
       </button>
-      {abierto && <div className="p-4 sm:p-5 border-t border-[var(--line)] bg-[var(--ink-900)]/40">{children}</div>}
+      <div
+        ref={contentRef}
+        style={{ overflow: "hidden" }}
+        className="border-t border-[var(--line)] bg-[var(--ink-900)]/40"
+      >
+        <div className="p-4 sm:p-5">
+          {children}
+        </div>
+      </div>
     </div>
   );
 };
+

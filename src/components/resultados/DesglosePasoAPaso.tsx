@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Tarjeta } from "@/components/ui";
 import { ResultadoCalculo } from "@/nucleo/rentabilidad/tipos";
 import { formatearMoneda, formatearPorcentaje } from "@/nucleo/rentabilidad/formato";
 import { DesgloseIcono } from "@/components/iconos";
+import gsap from "gsap";
 
 export interface DesglosePasoAPasoProps {
   resultado: ResultadoCalculo;
@@ -11,6 +12,33 @@ export interface DesglosePasoAPasoProps {
 export const DesglosePasoAPaso: React.FC<DesglosePasoAPasoProps> = ({ resultado }) => {
   const m = resultado.entradaAplicada.moneda || "USD";
   const { larga, corta, entradaAplicada } = resultado;
+  
+  const tbodyRef = useRef<HTMLTableSectionElement>(null);
+
+  useEffect(() => {
+    if (!tbodyRef.current) return;
+
+    const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isReduced) return;
+
+    const rows = tbodyRef.current.querySelectorAll("tr");
+
+    const ctx = gsap.context(() => {
+      // Configurar estado inicial
+      gsap.set(rows, { opacity: 0, y: 8 });
+
+      // Animar con escalonado (stagger)
+      gsap.to(rows, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.05,
+        ease: "power2.out",
+      });
+    }, tbodyRef);
+
+    return () => ctx.revert();
+  }, [resultado]);
 
   return (
     <Tarjeta superficie="base" className="w-full space-y-4">
@@ -30,7 +58,7 @@ export const DesglosePasoAPaso: React.FC<DesglosePasoAPasoProps> = ({ resultado 
               <th className="py-2 pl-3 text-right font-normal text-[var(--teal-400)]">Renta Corta</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)] text-[var(--mist-100)]">
+          <tbody ref={tbodyRef} className="divide-y divide-[var(--line)] text-[var(--mist-100)]">
             {/* Inversión Inicial */}
             <tr className="bg-[var(--ink-700)]/30 font-semibold">
               <td className="py-2.5 pr-4">Inversión Total Requerida</td>
@@ -164,3 +192,4 @@ export const DesglosePasoAPaso: React.FC<DesglosePasoAPasoProps> = ({ resultado 
     </Tarjeta>
   );
 };
+

@@ -11,8 +11,7 @@ export interface SelectorMonedaProps {
 const OPCIONES_MONEDA: { valor: SimboloMoneda; etiqueta: string; simbolo: string }[] = [
   { valor: "USD", etiqueta: "Dólares", simbolo: "US$" },
   { valor: "EUR", etiqueta: "Euros", simbolo: "€" },
-  { valor: "COP", etiqueta: "Pesos CO", simbolo: "COL$" },
-  { valor: "MXN", etiqueta: "Pesos MX", simbolo: "MX$" },
+  { valor: "DOP", etiqueta: "Peso Dominicano", simbolo: "RD$" },
 ];
 
 export const SelectorMoneda: React.FC<SelectorMonedaProps> = ({ valor, onCambio }) => {
@@ -21,7 +20,7 @@ export const SelectorMoneda: React.FC<SelectorMonedaProps> = ({ valor, onCambio 
       <label className="text-xs font-medium text-[var(--mist-400)] tracking-wide">
         Moneda
       </label>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-sm bg-[var(--ink-800)] border border-[var(--line)]">
+      <div className="grid grid-cols-3 gap-1.5 p-1 rounded-sm bg-[var(--ink-800)] border border-[var(--line)]">
         {OPCIONES_MONEDA.map((opcion) => {
           const seleccionada = valor === opcion.valor;
           return (

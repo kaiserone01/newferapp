@@ -1,7 +1,7 @@
 /**
  * Moneda admitida para el formato de salida
  */
-export type SimboloMoneda = "USD" | "EUR" | "COP" | "MXN";
+export type SimboloMoneda = "USD" | "EUR" | "DOP";
 
 /**
  * Canal de distribución para renta corta (determina la comisión por defecto)

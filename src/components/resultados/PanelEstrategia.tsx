@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Tarjeta, Insignia } from "@/components/ui";
 import { TorreIcono, CasaIcono } from "@/components/iconos";
+import gsap from "gsap";
 
 export interface PanelEstrategiaProps {
   tipo: "larga" | "corta";
   titulo: string;
   subtitulo: string;
   rentabilidadNetaStr: string;
+  rentabilidadNetaVal: number;
   rangoMinMaxStr: string;
   flujoMensualStr: string;
   ingresoBrutoStr: string;
@@ -19,6 +21,7 @@ export const PanelEstrategia: React.FC<PanelEstrategiaProps> = ({
   titulo,
   subtitulo,
   rentabilidadNetaStr,
+  rentabilidadNetaVal,
   rangoMinMaxStr,
   flujoMensualStr,
   ingresoBrutoStr,
@@ -28,6 +31,43 @@ export const PanelEstrategia: React.FC<PanelEstrategiaProps> = ({
   const esLarga = tipo === "larga";
   const colorBorde = esLarga ? "brass" : "teal";
   const colorTextoHex = esLarga ? "var(--brass-400)" : "var(--teal-400)";
+  
+  const numRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!numRef.current) return;
+
+    const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const formateador = new Intl.NumberFormat("es-ES", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    if (isReduced) {
+      numRef.current.textContent = `${formateador.format(rentabilidadNetaVal)}%`;
+      return;
+    }
+
+    const obj = { val: 0 };
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        obj,
+        { val: 0 },
+        {
+          val: rentabilidadNetaVal,
+          duration: 0.9,
+          ease: "power2.out",
+          onUpdate: () => {
+            if (numRef.current) {
+              numRef.current.textContent = `${formateador.format(obj.val)}%`;
+            }
+          },
+        }
+      );
+    }, numRef);
+
+    return () => ctx.revert();
+  }, [rentabilidadNetaVal]);
 
   return (
     <Tarjeta
@@ -62,6 +102,7 @@ export const PanelEstrategia: React.FC<PanelEstrategiaProps> = ({
             Rentabilidad Neta Anual
           </span>
           <div
+            ref={numRef}
             className="text-4xl sm:text-5xl font-display font-bold tabular-nums tracking-tight"
             style={{ color: colorTextoHex }}
           >
@@ -85,3 +126,4 @@ export const PanelEstrategia: React.FC<PanelEstrategiaProps> = ({
     </Tarjeta>
   );
 };
+

@@ -3,8 +3,7 @@ import { SimboloMoneda } from "./tipos";
 const MAPEADOR_MONEDAS: Record<SimboloMoneda, { locale: string; currency: string; symbol: string }> = {
   USD: { locale: "es-US", currency: "USD", symbol: "US$" },
   EUR: { locale: "es-ES", currency: "EUR", symbol: "€" },
-  COP: { locale: "es-CO", currency: "COP", symbol: "COL$" },
-  MXN: { locale: "es-MX", currency: "MXN", symbol: "MX$" },
+  DOP: { locale: "es-DO", currency: "DOP", symbol: "RD$" },
 };
 
 /**

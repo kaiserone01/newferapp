@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Input, Tarjeta } from "@/components/ui";
+import { Input, Tarjeta, Boton } from "@/components/ui";
 import { SelectorMoneda } from "./SelectorMoneda";
 import { AjustesAvanzados } from "./AjustesAvanzados";
 import { EntradaFormularioRaw } from "@/nucleo/rentabilidad/esquema-entrada";
@@ -17,8 +17,7 @@ export interface FormularioPrincipalProps {
 const MAPEADOR_SIMBOLOS: Record<SimboloMoneda, string> = {
   USD: "US$",
   EUR: "€",
-  COP: "COL$",
-  MXN: "MX$",
+  DOP: "RD$",
 };
 
 export const FormularioPrincipal: React.FC<FormularioPrincipalProps> = ({
@@ -36,23 +35,51 @@ export const FormularioPrincipal: React.FC<FormularioPrincipalProps> = ({
   const [errores, setErrores] = useState<Record<string, string>>({});
 
   const handleCampoChange = (campo: keyof EntradaFormularioRaw, valor: string) => {
-    setVal((prev) => {
-      const nuevoState = { ...prev, [campo]: valor };
-      procesarValidacion(nuevoState);
-      return nuevoState;
-    });
+    setVal((prev) => ({ ...prev, [campo]: valor }));
   };
 
   const handleMonedaChange = (nuevaMoneda: SimboloMoneda) => {
-    setVal((prev) => {
-      const nuevoState = { ...prev, moneda: nuevaMoneda };
-      procesarValidacion(nuevoState);
-      return nuevoState;
-    });
+    setVal((prev) => ({ ...prev, moneda: nuevaMoneda }));
   };
 
-  const procesarValidacion = (raw: EntradaFormularioRaw) => {
-    const res = FormularioAdapter.transformarYValidar(raw);
+  const handleReset = () => {
+    const defaultVal: EntradaFormularioRaw = {
+      precio: "",
+      rentaMensualLarga: "",
+      tarifaNocheCorta: "",
+      ocupacionCorta: "",
+      moneda: "USD",
+      costosCierrePorcentaje: "",
+      remodelacionMonto: "",
+      dotacionLargaPorcentaje: "",
+      dotacionCortaPorcentaje: "",
+      vacanciaLargaPorcentaje: "",
+      mantenimientoLargaPorcentaje: "",
+      mantenimientoCortaPorcentaje: "",
+      administracionLargaPorcentaje: "",
+      administracionCortaPorcentaje: "",
+      capexPorcentaje: "",
+      comisionPlataformaPorcentaje: "",
+      duracionEstadiaNoches: "",
+      costoLimpiezaMonto: "",
+      serviciosMensualesCortaMonto: "",
+      seguroAnualPorcentaje: "",
+      predialAnualPorcentaje: "",
+      otrosGastosAnualesMonto: "",
+    };
+    setVal(defaultVal);
+  };
+
+  // Validación automática cada vez que cambia el estado del formulario (efecto seguro sin actualización en render)
+  useEffect(() => {
+    const estaVacio = !val.precio && !val.rentaMensualLarga && !val.tarifaNocheCorta && !val.ocupacionCorta;
+    if (estaVacio) {
+      setErrores({});
+      onCalculoInvalido({});
+      return;
+    }
+
+    const res = FormularioAdapter.transformarYValidar(val);
     if (res.exito && res.datos) {
       setErrores({});
       onCalculoValido(res.datos);
@@ -60,12 +87,7 @@ export const FormularioPrincipal: React.FC<FormularioPrincipalProps> = ({
       setErrores(res.errores);
       onCalculoInvalido(res.errores);
     }
-  };
-
-  // Validación inicial en el primer render
-  useEffect(() => {
-    procesarValidacion(val);
-  }, []);
+  }, [val, onCalculoValido, onCalculoInvalido]);
 
   const simboloMoneda = MAPEADOR_SIMBOLOS[val.moneda || "USD"];
 
@@ -80,7 +102,29 @@ export const FormularioPrincipal: React.FC<FormularioPrincipalProps> = ({
               Datos de la Propiedad
             </h2>
           </div>
-          <span className="text-xs text-[var(--mist-400)] font-mono">Entrada Mínima</span>
+          <div className="flex items-center gap-3">
+            <Boton
+              variante="fantasma"
+              tamano="sm"
+              onClick={handleReset}
+              className="text-[var(--mist-400)] hover:text-[var(--coral-400)] transition-colors"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+              </svg>
+              <span>Limpiar Datos</span>
+            </Boton>
+            <span className="text-xs text-[var(--mist-600)] font-mono hidden sm:inline">Entrada Mínima</span>
+          </div>
         </div>
 
         {/* Selector de Moneda */}

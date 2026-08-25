@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Tarjeta, Insignia } from "@/components/ui";
 import { ResultadoEquilibrio } from "@/nucleo/rentabilidad/tipos";
 import { EjeIcono, AlertaIcono } from "@/components/iconos";
+import gsap from "gsap";
 
 export interface EjeOcupacionProps {
   equilibrio: ResultadoEquilibrio;
@@ -26,6 +27,61 @@ export const EjeOcupacion: React.FC<EjeOcupacionProps> = ({
   const inicioRelleno = posEquilibrioPct !== null ? Math.min(posEquilibrioPct, posEstimadaPct) : 0;
   const anchoRelleno =
     posEquilibrioPct !== null ? Math.abs(posEstimadaPct - posEquilibrioPct) : 0;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const rellenoRef = useRef<HTMLDivElement>(null);
+  const eqMarkerRef = useRef<HTMLDivElement>(null);
+  const estMarkerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (estado === "sin_superacion") return;
+
+    const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isReduced) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+
+      // Configurar estado inicial
+      if (rellenoRef.current) {
+        gsap.set(rellenoRef.current, { scaleX: 0, transformOrigin: "left center" });
+      }
+      if (eqMarkerRef.current) {
+        gsap.set(eqMarkerRef.current, { scale: 0 });
+      }
+      if (estMarkerRef.current) {
+        gsap.set(estMarkerRef.current, { scale: 0 });
+      }
+
+      // Animar tramo de relleno (700ms)
+      if (rellenoRef.current) {
+        tl.to(rellenoRef.current, {
+          scaleX: 1,
+          duration: 0.7,
+        });
+      }
+
+      // Animar marcadores (300ms)
+      const markers = [];
+      if (eqMarkerRef.current) markers.push(eqMarkerRef.current);
+      if (estMarkerRef.current) markers.push(estMarkerRef.current);
+
+      if (markers.length > 0) {
+        tl.to(
+          markers,
+          {
+            scale: 1,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: "back.out(1.7)",
+          },
+          "-=0.2"
+        );
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, [porcentajeEquilibrio, ocupacionEstimadaPct, estado]);
 
   return (
     <Tarjeta superficie="base" className="w-full space-y-5">
@@ -64,11 +120,12 @@ export const EjeOcupacion: React.FC<EjeOcupacionProps> = ({
 
       {/* Elemento Firma: Barra Horizontal de 0% a 100% con rounded-full */}
       {estado !== "sin_superacion" && (
-        <div className="pt-6 pb-4 px-2 sm:px-4">
+        <div ref={containerRef} className="pt-6 pb-4 px-2 sm:px-4">
           <div className="relative w-full h-3 bg-[var(--ink-700)] rounded-full border border-[var(--line)]">
             {/* Tramo Relleno entre Equilibrio y Estimada */}
             {posEquilibrioPct !== null && (
               <div
+                ref={rellenoRef}
                 className={`absolute h-full rounded-full transition-all duration-300 ${
                   tieneMargenPositivo ? "bg-[var(--teal-400)]/40" : "bg-[var(--coral-400)]/40"
                 }`}
@@ -82,6 +139,7 @@ export const EjeOcupacion: React.FC<EjeOcupacionProps> = ({
             {/* Marcador 1: Punto de Equilibrio (Triángulo en --mist-400) */}
             {posEquilibrioPct !== null && (
               <div
+                ref={eqMarkerRef}
                 className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center group z-10"
                 style={{ left: `${posEquilibrioPct}%` }}
               >
@@ -96,6 +154,7 @@ export const EjeOcupacion: React.FC<EjeOcupacionProps> = ({
 
             {/* Marcador 2: Ocupación Estimada (Círculo lleno en --teal-400) */}
             <div
+              ref={estMarkerRef}
               className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center z-20"
               style={{ left: `${posEstimadaPct}%` }}
             >

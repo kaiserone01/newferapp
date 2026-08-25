@@ -12,14 +12,14 @@ import { BalanzaIcono } from "@/components/iconos";
 export default function Home() {
   const [resultado, setResultado] = useState<ResultadoCalculo | null>(null);
 
-  const handleCalculoValido = (datos: EntradaCalculo) => {
+  const handleCalculoValido = React.useCallback((datos: EntradaCalculo) => {
     const res = calculadora.calcular(datos);
     setResultado(res);
-  };
+  }, []);
 
-  const handleCalculoInvalido = () => {
+  const handleCalculoInvalido = React.useCallback(() => {
     setResultado(null);
-  };
+  }, []);
 
   const vista = resultado ? UIAdapter.adaptarParaUI(resultado) : null;
 
@@ -60,7 +60,7 @@ export default function Home() {
           {/* Comparador de Estrategias y Cifra Héroe */}
           <ComparadorEstrategias
             vista={vista}
-            rentabilidadNegativa={resultado.rentabilidadNegativa}
+            resultado={resultado}
           />
 
           {/* Elemento Firma: Eje de Ocupación de Equilibrio (§7.4) */}
