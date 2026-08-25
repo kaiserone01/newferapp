@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --ink-900: #070D1A;  /* fondo */
+  --ink-800: #0E1728;  /* superficie */
+  --ink-700: #16223A;  /* superficie elevada */
+  --line: #22304E;     /* bordes hairline */
+
+  --mist-100: #E9EEF8;  /* texto primario */
+  --mist-400: #8E9CBA;  /* texto secundario */
+  --mist-600: #55648A;  /* texto terciario */
+
+  --brass-400: #D9B26A; /* RENTA LARGA */
+  --brass-600: #A8842F;
+
+  --teal-400: #4FD1C5;  /* RENTA CORTA */
+  --teal-600: #2A9D8F;
+
+  --coral-400: #F2765C; /* gastos, negativo, pesimista */
+  --amber-400: #E8A33D; /* advertencia */
+
+  --background: var(--ink-900);
+  --foreground: var(--mist-100);
+}
+
+@theme {
+  --color-ink-900: var(--ink-900);
+  --color-ink-800: var(--ink-800);
+  --color-ink-700: var(--ink-700);
+  --color-line: var(--line);
+
+  --color-mist-100: var(--mist-100);
+  --color-mist-400: var(--mist-400);
+  --color-mist-600: var(--mist-600);
+
+  --color-brass-400: var(--brass-400);
+  --color-brass-600: var(--brass-600);
+
+  --color-teal-400: var(--teal-400);
+  --color-teal-600: var(--teal-600);
+
+  --color-coral-400: var(--coral-400);
+  --color-amber-400: var(--amber-400);
+
+  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+}
+
+body {
+  background-color: var(--ink-900);
+  color: var(--mist-100);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
