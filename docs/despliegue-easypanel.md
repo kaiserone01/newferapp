@@ -42,4 +42,16 @@ Esta guía describe el procedimiento para desplegar el proyecto **`newfer-rentab
 
 ## Auto-Deploy
 
-EasyPanel configurará automáticamente un Webhook en tu repositorio de GitHub para que cada commit push a la rama `main` despliegue la nueva versión inmediatamente tras pasar los tests del pipeline CI.
+EasyPanel configurará automáticamente un Webhook en tu repositorio de GitHub para que cada commit push a la rama `main` despliegue la nueva versión inmediatamente (build directo del `Dockerfile`, sin pipeline de CI intermedio). Antes de hacer push a `main`, correr localmente `npm run lint` y `npm run test`.
+
+---
+
+## Volumen persistente para `/visitas`
+
+La ruta `/visitas` guarda sus estadísticas en un archivo SQLite en `/app/data/visitas.db` dentro del contenedor. Si no se configura un volumen persistente, ese archivo se pierde en cada deploy (el contenedor se recrea desde cero).
+
+En EasyPanel:
+
+1. En la app, ir a la pestaña **Mounts** (o **Volumes**).
+2. Agregar un volumen tipo **Volume** con **Mount Path** = `/app/data`.
+3. Guardar y volver a desplegar.

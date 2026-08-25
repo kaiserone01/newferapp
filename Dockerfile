@@ -3,7 +3,7 @@ FROM node:22-alpine AS base
 
 # 2. Dependencias de construcción
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -36,6 +36,9 @@ COPY --from=builder /app/public ./public
 
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
+
+RUN mkdir data
+RUN chown nextjs:nodejs data
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static

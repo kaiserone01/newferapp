@@ -9,4 +9,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+    volumes:
+      - visitas-data:/app/data
     restart: unless-stopped
+
+volumes:
+  visitas-data:
