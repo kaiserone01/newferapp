@@ -3,6 +3,11 @@
 import { useEffect, useRef } from "react";
 
 const INTERVALO_PING_MS = 20_000;
+const RUTAS_EXCLUIDAS = ["/visitas"];
+
+function rutaExcluida(pathname: string): boolean {
+  return RUTAS_EXCLUIDAS.some((ruta) => pathname === ruta || pathname.startsWith(`${ruta}/`));
+}
 
 function generarSessionId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -16,6 +21,7 @@ export function VisitTracker() {
 
   useEffect(() => {
     if (yaMontado.current) return;
+    if (rutaExcluida(window.location.pathname)) return;
     yaMontado.current = true;
 
     const sessionId = generarSessionId();
