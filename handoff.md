@@ -12,12 +12,14 @@ Construir una calculadora interactiva de rentabilidad inmobiliaria web stateless
   - Botón de Reset: Implementado un botón "Limpiar Datos" de tipo fantasma en el cabezal del formulario que restablece todos los inputs (incluidos los avanzados) a vacío, ocultando de manera limpia el panel de resultados.
   - Solución al Render Loop (Warning React): Envueltos los callbacks `handleCalculoValido` y `handleCalculoInvalido` en hooks `useCallback` en `page.tsx`. Esto estabiliza sus identidades de referencia y previene bucles de actualización infinita con el `useEffect` de validación del formulario.
   - Descargas de PDF Correctas: Se corrigió el tipo MIME del blob de descarga forzando explícitamente `type: "application/pdf"`. Esto garantiza que los navegadores y sistemas operativos de escritorio o móviles abran y muestren correctamente el archivo descargado como un documento PDF nativo.
+  - Documentación del Sistema: Creado el manual descriptivo de funcionamiento e inputs financieros del proyecto en `docs/manual-usuario.md`.
 - **Pendiente:**
   - Cierre y entrega del proyecto. No restan fases técnicas por desarrollar.
 
 ## 3) Archivos y cambios
-- [page.tsx](file:///d:/newfersuite-app/recursos/newferapp/src/app/page.tsx): Envueltos `handleCalculoValido` y `handleCalculoInvalido` en hooks `useCallback` para estabilizar referencias.
-- [PDFAdapter.ts](file:///d:/newfersuite-app/recursos/newferapp/src/adaptadores/salida/PDFAdapter.ts): Envuelto el blob compilado en un nuevo objeto `Blob` forzando el tipo MIME `application/pdf` antes de generar el Object URL.
+- [manual-usuario.md](file:///d:/newfersuite-app/recursos/newferapp/docs/manual-usuario.md): Creado un manual de usuario detallado explicando la lógica de la aplicación, cada dato del formulario (básico y avanzado) y la interpretación de los paneles de resultados.
+- [page.tsx](file:///d:/newfersuite-app/recursos/newferapp/src/app/page.tsx): Envueltos `handleCalculoValido` y `handleCalculoInvalido` en hooks `useCallback` para la estabilidad de las referencias de renderizado.
+- [PDFAdapter.ts](file:///d:/newfersuite-app/recursos/newferapp/src/adaptadores/salida/PDFAdapter.ts): Envuelto el blob compilado en un nuevo objeto `Blob` forzando el tipo MIME `application/pdf` antes de la descarga.
 - [FormularioPrincipal.tsx](file:///d:/newfersuite-app/recursos/newferapp/src/components/formulario/FormularioPrincipal.tsx): Importado el componente `Boton`, agregada la función `handleReset` que limpia todos los campos de texto e invalida el cálculo actual, y añadido el botón "Limpiar Datos" con icono de refresco en el encabezado de la tarjeta. Actualizado `MAPEADOR_SIMBOLOS` para asociar `DOP` con `RD$`.
 - [tipos.ts](file:///d:/newfersuite-app/recursos/newferapp/src/nucleo/rentabilidad/tipos.ts): Restringido `SimboloMoneda` a `"USD" | "EUR" | "DOP"`.
 - [esquema-entrada.ts](file:///d:/newfersuite-app/recursos/newferapp/src/nucleo/rentabilidad/esquema-entrada.ts): Actualizado el enum de moneda de Zod para validar únicamente `"USD"`, `"EUR"` y `"DOP"`.

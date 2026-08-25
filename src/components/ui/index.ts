@@ -4,3 +4,4 @@ export * from "./Tarjeta";
 export * from "./Desplegable";
 export * from "./Separador";
 export * from "./Insignia";
+export * from "./TourGuia";

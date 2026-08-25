@@ -57,8 +57,8 @@ export const ComparadorEstrategias: React.FC<ComparadorEstrategiasProps> = ({
           </span>
         </div>
 
-        {/* Botón Descargar PDF */}
         <Boton
+          id="btn-descargar-pdf"
           variante="primario"
           tamano="sm"
           onClick={handleDescargarPDF}
