@@ -24,10 +24,12 @@ function crearConexion(): Database.Database {
       sistema_operativo TEXT,
       iniciado_en TEXT NOT NULL,
       finalizado_en TEXT,
-      duracion_segundos INTEGER
+      duracion_segundos INTEGER,
+      ultimo_ping TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_visitas_iniciado_en ON visitas(iniciado_en);
     CREATE INDEX IF NOT EXISTS idx_visitas_session_id ON visitas(session_id);
+    CREATE INDEX IF NOT EXISTS idx_visitas_en_linea ON visitas(finalizado_en, ultimo_ping);
   `);
 
   return conexion;

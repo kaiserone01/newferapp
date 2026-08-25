@@ -17,6 +17,10 @@ export interface RegistrarFinEntrada {
   duracionSegundos: number;
 }
 
+export interface RegistrarPingEntrada {
+  sessionId: string;
+}
+
 export interface PuntoSerieTemporal {
   bucket: string;
   visitas: number;

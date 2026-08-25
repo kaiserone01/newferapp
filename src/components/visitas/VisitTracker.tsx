@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+const INTERVALO_PING_MS = 20_000;
+
 function generarSessionId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -26,6 +28,17 @@ export function VisitTracker() {
       keepalive: true,
     }).catch(() => {});
 
+    const enviarPing = () => {
+      fetch("/api/visitas/ping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+        keepalive: true,
+      }).catch(() => {});
+    };
+
+    const intervaloPing = window.setInterval(enviarPing, INTERVALO_PING_MS);
+
     const enviarFin = () => {
       const duracionSegundos = (Date.now() - inicio) / 1000;
       navigator.sendBeacon(
@@ -44,6 +57,7 @@ export function VisitTracker() {
     window.addEventListener("pagehide", enviarFin);
 
     return () => {
+      window.clearInterval(intervaloPing);
       document.removeEventListener("visibilitychange", alCambiarVisibilidad);
       window.removeEventListener("pagehide", enviarFin);
     };

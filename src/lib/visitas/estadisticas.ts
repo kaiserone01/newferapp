@@ -8,6 +8,19 @@ import type {
 } from "./tipos";
 
 const LIMITE_ETIQUETAS = 10;
+const UMBRAL_EN_LINEA_SEGUNDOS = 60;
+
+export function contarEnLinea(): number {
+  const umbral = new Date(Date.now() - UMBRAL_EN_LINEA_SEGUNDOS * 1000).toISOString();
+
+  const { enLinea } = db
+    .prepare(
+      `SELECT COUNT(*) AS enLinea FROM visitas WHERE finalizado_en IS NULL AND ultimo_ping >= ?`
+    )
+    .get(umbral) as { enLinea: number };
+
+  return enLinea;
+}
 
 function condicionDesde(desde: string | null): { clausula: string; params: unknown[] } {
   return desde ? { clausula: "WHERE iniciado_en >= ?", params: [desde] } : { clausula: "", params: [] };

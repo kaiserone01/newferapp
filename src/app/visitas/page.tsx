@@ -1,9 +1,10 @@
 import { Tarjeta } from "@/components/ui";
+import { ContadorEnLinea } from "@/components/visitas/ContadorEnLinea";
 import { GraficoSerieTemporal } from "@/components/visitas/GraficoSerieTemporal";
 import { ListaDesglose } from "@/components/visitas/ListaDesglose";
 import { SelectorRango } from "@/components/visitas/SelectorRango";
 import { TarjetaEstadistica } from "@/components/visitas/TarjetaEstadistica";
-import { obtenerEstadisticas } from "@/lib/visitas/estadisticas";
+import { contarEnLinea, obtenerEstadisticas } from "@/lib/visitas/estadisticas";
 import { formatearDuracion, formatearNumero, nombrePais } from "@/lib/visitas/formato";
 import type { RangoTiempo } from "@/lib/visitas/tipos";
 
@@ -24,6 +25,7 @@ export default async function VisitasPage({
   const params = await searchParams;
   const rango = normalizarRango(params.rango);
   const estadisticas = obtenerEstadisticas(rango);
+  const enLineaInicial = contarEnLinea();
 
   return (
     <main className="min-h-screen p-3 sm:p-6 lg:p-8 max-w-[1180px] mx-auto space-y-6 sm:space-y-8">
@@ -39,7 +41,8 @@ export default async function VisitasPage({
         <SelectorRango activo={rango} />
       </header>
 
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <ContadorEnLinea valorInicial={enLineaInicial} />
         <TarjetaEstadistica etiqueta="Visitas" valor={formatearNumero(estadisticas.totalVisitas)} />
         <TarjetaEstadistica
           etiqueta="Visitantes únicos"

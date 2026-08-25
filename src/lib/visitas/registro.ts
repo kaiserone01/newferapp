@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import geoip from "geoip-lite";
 import { NextRequest, userAgent } from "next/server";
 import db from "./db";
-import type { RegistrarFinEntrada, RegistrarInicioEntrada } from "./tipos";
+import type { RegistrarFinEntrada, RegistrarInicioEntrada, RegistrarPingEntrada } from "./tipos";
 
 function obtenerIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -37,11 +37,12 @@ export function calcularVisitorHash(ip: string, userAgentStr: string): string {
 
 export function registrarInicio(entrada: RegistrarInicioEntrada): void {
   const visitorHash = calcularVisitorHash(entrada.ip, entrada.userAgent);
+  const ahora = new Date().toISOString();
 
   db.prepare(
     `INSERT INTO visitas
-      (session_id, visitor_hash, path, pais, ciudad, dispositivo, navegador, sistema_operativo, iniciado_en)
-     VALUES (@sessionId, @visitorHash, @path, @pais, @ciudad, @dispositivo, @navegador, @sistemaOperativo, @iniciadoEn)`
+      (session_id, visitor_hash, path, pais, ciudad, dispositivo, navegador, sistema_operativo, iniciado_en, ultimo_ping)
+     VALUES (@sessionId, @visitorHash, @path, @pais, @ciudad, @dispositivo, @navegador, @sistemaOperativo, @iniciadoEn, @ultimoPing)`
   ).run({
     sessionId: entrada.sessionId,
     visitorHash,
@@ -51,7 +52,19 @@ export function registrarInicio(entrada: RegistrarInicioEntrada): void {
     dispositivo: entrada.dispositivo,
     navegador: entrada.navegador,
     sistemaOperativo: entrada.sistemaOperativo,
-    iniciadoEn: new Date().toISOString(),
+    iniciadoEn: ahora,
+    ultimoPing: ahora,
+  });
+}
+
+export function registrarPing(entrada: RegistrarPingEntrada): void {
+  db.prepare(
+    `UPDATE visitas
+     SET ultimo_ping = @ultimoPing
+     WHERE session_id = @sessionId AND finalizado_en IS NULL`
+  ).run({
+    sessionId: entrada.sessionId,
+    ultimoPing: new Date().toISOString(),
   });
 }
 
